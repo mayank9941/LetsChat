@@ -15,6 +15,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.letschat.screens.ChatListScreen
 import com.example.letschat.screens.ProfileScreen
 import com.example.letschat.screens.SignupScreen
+import com.example.letschat.screens.SingleChatScreen
+import com.example.letschat.screens.SingleStatusScreen
+import com.example.letschat.screens.StatusScreen
 import com.example.letschat.ui.theme.LetsChatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -56,23 +59,37 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun chatAppNavigation(){
+fun chatAppNavigation() {
     val navController = rememberNavController()
     var viewModel = hiltViewModel<MMViewModel>()
-    NavHost(navController =navController , startDestination = DestinationScreen.SignUp.route ){
-        composable(DestinationScreen.SignUp.route){
-            SignupScreen(navController,viewModel)
+    NavHost(navController = navController, startDestination = DestinationScreen.SignUp.route) {
+        composable(DestinationScreen.SignUp.route) {
+            SignupScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.SingleChat.route) {
+            val chatId = it.arguments?.getString("chatId")
+            chatId?.let {
+                SingleChatScreen(navController, viewModel, chatId)
+            }
+        }
+        composable(DestinationScreen.StatusList.route) {
+            StatusScreen(navController, viewModel)
         }
         composable(DestinationScreen.ChatList.route) {
-            ChatListScreen(navController,viewModel)
+            ChatListScreen(navController, viewModel)
         }
         composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController, viewModel)
         }
+        composable(DestinationScreen.SingleStatus.route) {
+            val userId = it.arguments?.getString("userId")
+            userId?.let {
+                SingleStatusScreen(navController, viewModel, userId = it)
+            }
+        }
     }
+
 }
-
-
 
 
 
