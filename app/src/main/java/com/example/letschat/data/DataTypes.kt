@@ -14,7 +14,6 @@ var imageUrl: String?=""
     )
 }
 
-
 data class ChatData(
     val chatId: String? = "",
     val user1: ChatUser = ChatUser(),
