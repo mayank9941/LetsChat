@@ -92,8 +92,8 @@ fun LoginScreen(navController: NavController, viewModel: MMViewModel) {
             Button(
                 onClick = {
                     viewModel.login(
-                        emailState.value.text,
-                        passwordState.value.text
+                        email = emailState.value.text,
+                       password =  passwordState.value.text
                     )
                 }, modifier = Modifier
                     .padding(8.dp)

@@ -1,5 +1,6 @@
 package com.example.letschat
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -34,8 +35,6 @@ class MMViewModel @Inject constructor(
     private var db: FirebaseFirestore,
     private val storage: FirebaseStorage
 ): ViewModel() {
-
-
     var inProgress = mutableStateOf(false)
     var inProcessChats = mutableStateOf(false)
     private val eventMutableState = mutableStateOf<Event<String>?>(null)
@@ -128,6 +127,7 @@ class MMViewModel @Inject constructor(
     }
 
 
+    @SuppressLint("SuspiciousIndentation")
     private fun getUserData(uid: String) {
         inProgress.value = true
         db.collection(USER_NODE).document(uid).addSnapshotListener { value, error ->
@@ -139,7 +139,7 @@ class MMViewModel @Inject constructor(
                 userData.value = user
                 inProgress.value = false
                    populateChats()
-//                populateStatuses()
+                   populateStatuses()
             }
         }
     }

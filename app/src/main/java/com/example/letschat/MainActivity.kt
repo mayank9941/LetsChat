@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.letschat.screens.ChatListScreen
+import com.example.letschat.screens.LoginScreen
 import com.example.letschat.screens.ProfileScreen
 import com.example.letschat.screens.SignupScreen
 import com.example.letschat.screens.SingleChatScreen
@@ -66,6 +67,12 @@ fun chatAppNavigation() {
         composable(DestinationScreen.SignUp.route) {
             SignupScreen(navController, viewModel)
         }
+        composable(DestinationScreen.Login.route) {
+            LoginScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.ChatList.route) {
+            ChatListScreen(navController, viewModel)
+        }
         composable(DestinationScreen.SingleChat.route) {
             val chatId = it.arguments?.getString("chatId")
             chatId?.let {
@@ -74,9 +81,6 @@ fun chatAppNavigation() {
         }
         composable(DestinationScreen.StatusList.route) {
             StatusScreen(navController, viewModel)
-        }
-        composable(DestinationScreen.ChatList.route) {
-            ChatListScreen(navController, viewModel)
         }
         composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController, viewModel)

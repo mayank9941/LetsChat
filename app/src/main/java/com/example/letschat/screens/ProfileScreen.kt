@@ -77,7 +77,7 @@ fun ProfileScreen(navController: NavController, viewModel: MMViewModel) {
                 },
                 onLogOut = {
                     viewModel.logout()
-                    navigateTo(navController, DestinationScreen.Login.route)
+                    navigateTo(navController, DestinationScreen.SignUp.route)
                 }
             )
             BottomNavigationMenu(BottomNavigationItem.PROFILE, navController)
