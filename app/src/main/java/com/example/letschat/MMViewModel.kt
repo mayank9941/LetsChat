@@ -11,6 +11,8 @@ import com.example.letschat.data.ChatUser
 import com.example.letschat.data.Event
 import com.example.letschat.data.MESSAGE
 import com.example.letschat.data.Message
+import com.example.letschat.data.STATUS
+import com.example.letschat.data.Status
 import com.example.letschat.data.USER_NODE
 import com.example.letschat.data.UserData
 import com.google.firebase.auth.FirebaseAuth
@@ -45,6 +47,9 @@ class MMViewModel @Inject constructor(
     val chatMessage = mutableStateOf<List<Message>>(listOf())
     private val inProgressChatMessage = mutableStateOf(false)
     private var currentChatMessageListener: ListenerRegistration? = null
+
+    val status = mutableStateOf<List<Status>>(listOf())
+    val inProgressStatus = mutableStateOf(false)
 
     init {
         val currentUser = auth.currentUser
@@ -293,4 +298,78 @@ class MMViewModel @Inject constructor(
             }
         }
     }
+
+    fun uploadStatus(uri: Uri) {
+        uploadImage(uri) {
+            createStatus(it.toString()) {newStatus ->
+                val updateStatusList = mutableListOf<Status>().apply {
+                    addAll(status.value ?: emptyList())
+                    add(newStatus)
+                }
+                status.value = updateStatusList
+            }
+        }
+    }
+
+    private fun createStatus(imageUrl: String, callback: (Status) -> Unit) {
+        val newStatus = Status(
+            ChatUser(
+                userData.value?.userId,
+                userData.value?.name,
+                userData.value?.number,
+                userData.value?.imageUrl,
+
+                ),
+            imageUrl,
+            System.currentTimeMillis()
+        )
+        db.collection(STATUS).document().set(newStatus).addOnSuccessListener {
+            callback(newStatus)
+        }.addOnFailureListener { exception ->
+            handleException(exception)
+        }
+    }
+
+    private fun populateStatuses() {
+        val timeDelta = 24L * 60 * 60 * 1000
+        val cutOff = System.currentTimeMillis() - timeDelta
+        inProgressStatus.value = true
+        db.collection(CHATS).where(
+            Filter.or(
+                Filter.equalTo("user1.userId", userData.value?.userId),
+                Filter.equalTo("user2.userId", userData.value?.userId),
+            )
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+                inProgressStatus.value = false
+                return@addSnapshotListener
+            }
+            if (value != null) {
+                val currentConnection = arrayListOf(userData.value?.userId)
+                val chats = value.toObjects<ChatData>()
+                chats.forEach { chat ->
+                    if (chat.user1.userId == userData.value?.userId) {
+                        currentConnection.add(chat.user2.userId)
+                    } else {
+                        currentConnection.add(chat.user1.userId)
+                    }
+                    db.collection(STATUS).whereGreaterThan("timeStamp", cutOff)
+                        .whereIn("user.userId", currentConnection)
+                        .addSnapshotListener { value, error ->
+                            if (error != null) {
+                                handleException(error)
+                                inProgressStatus.value = false
+                                return@addSnapshotListener
+                            }
+                            if (value != null) {
+                                status.value = value.toObjects()
+                                inProgressStatus.value = false
+                            }
+                        }
+                }
+            }
+        }
+    }
+
 }
